@@ -184,10 +184,12 @@ func (ProtocolErrorCode) EnumDescriptor() ([]byte, []int) {
 }
 
 type AttestationChallenge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nonce         []byte                 `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Requests key discovery. The quote challenge is delivered by credential activation.
+	// Version 1 uses activation followed by a quote over SHA-256(secret).
+	ProtocolVersion uint32 `protobuf:"varint,1,opt,name=protocol_version,json=protocolVersion,proto3" json:"protocol_version,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *AttestationChallenge) Reset() {
@@ -220,24 +222,146 @@ func (*AttestationChallenge) Descriptor() ([]byte, []int) {
 	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *AttestationChallenge) GetNonce() []byte {
+func (x *AttestationChallenge) GetProtocolVersion() uint32 {
 	if x != nil {
-		return x.Nonce
+		return x.ProtocolVersion
+	}
+	return 0
+}
+
+// Initial prover response; future optional session capabilities belong here.
+type AttestationHello struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keys          *AttestationKeys       `protobuf:"bytes,1,opt,name=keys,proto3" json:"keys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AttestationHello) Reset() {
+	*x = AttestationHello{}
+	mi := &file_attestux_v1_wire_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AttestationHello) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AttestationHello) ProtoMessage() {}
+
+func (x *AttestationHello) ProtoReflect() protoreflect.Message {
+	mi := &file_attestux_v1_wire_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AttestationHello.ProtoReflect.Descriptor instead.
+func (*AttestationHello) Descriptor() ([]byte, []int) {
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AttestationHello) GetKeys() *AttestationKeys {
+	if x != nil {
+		return x.Keys
+	}
+	return nil
+}
+
+type AttestationKeys struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	AttestationPublic   []byte                 `protobuf:"bytes,1,opt,name=attestation_public,json=attestationPublic,proto3" json:"attestation_public,omitempty"`
+	AkCreateData        []byte                 `protobuf:"bytes,2,opt,name=ak_create_data,json=akCreateData,proto3" json:"ak_create_data,omitempty"`
+	AkCreateAttestation []byte                 `protobuf:"bytes,3,opt,name=ak_create_attestation,json=akCreateAttestation,proto3" json:"ak_create_attestation,omitempty"`
+	AkCreateSignature   []byte                 `protobuf:"bytes,4,opt,name=ak_create_signature,json=akCreateSignature,proto3" json:"ak_create_signature,omitempty"`
+	EndorsementKeys     []*EndorsementKey      `protobuf:"bytes,5,rep,name=endorsement_keys,json=endorsementKeys,proto3" json:"endorsement_keys,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *AttestationKeys) Reset() {
+	*x = AttestationKeys{}
+	mi := &file_attestux_v1_wire_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AttestationKeys) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AttestationKeys) ProtoMessage() {}
+
+func (x *AttestationKeys) ProtoReflect() protoreflect.Message {
+	mi := &file_attestux_v1_wire_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AttestationKeys.ProtoReflect.Descriptor instead.
+func (*AttestationKeys) Descriptor() ([]byte, []int) {
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AttestationKeys) GetAttestationPublic() []byte {
+	if x != nil {
+		return x.AttestationPublic
+	}
+	return nil
+}
+
+func (x *AttestationKeys) GetAkCreateData() []byte {
+	if x != nil {
+		return x.AkCreateData
+	}
+	return nil
+}
+
+func (x *AttestationKeys) GetAkCreateAttestation() []byte {
+	if x != nil {
+		return x.AkCreateAttestation
+	}
+	return nil
+}
+
+func (x *AttestationKeys) GetAkCreateSignature() []byte {
+	if x != nil {
+		return x.AkCreateSignature
+	}
+	return nil
+}
+
+func (x *AttestationKeys) GetEndorsementKeys() []*EndorsementKey {
+	if x != nil {
+		return x.EndorsementKeys
 	}
 	return nil
 }
 
 type Quote struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Quote         []byte                 `protobuf:"bytes,1,opt,name=quote,proto3" json:"quote,omitempty"`
-	Signature     []byte                 `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// extraData is SHA-256 of the recovered activation secret, never the secret itself.
+	Quote         []byte `protobuf:"bytes,1,opt,name=quote,proto3" json:"quote,omitempty"`
+	Signature     []byte `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Quote) Reset() {
 	*x = Quote{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[1]
+	mi := &file_attestux_v1_wire_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -249,7 +373,7 @@ func (x *Quote) String() string {
 func (*Quote) ProtoMessage() {}
 
 func (x *Quote) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[1]
+	mi := &file_attestux_v1_wire_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -262,7 +386,7 @@ func (x *Quote) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Quote.ProtoReflect.Descriptor instead.
 func (*Quote) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{1}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Quote) GetQuote() []byte {
@@ -289,7 +413,7 @@ type Pcr struct {
 
 func (x *Pcr) Reset() {
 	*x = Pcr{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[2]
+	mi := &file_attestux_v1_wire_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -301,7 +425,7 @@ func (x *Pcr) String() string {
 func (*Pcr) ProtoMessage() {}
 
 func (x *Pcr) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[2]
+	mi := &file_attestux_v1_wire_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -314,7 +438,7 @@ func (x *Pcr) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pcr.ProtoReflect.Descriptor instead.
 func (*Pcr) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{2}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Pcr) GetIndex() uint32 {
@@ -342,7 +466,7 @@ type PcrBankEvidence struct {
 
 func (x *PcrBankEvidence) Reset() {
 	*x = PcrBankEvidence{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[3]
+	mi := &file_attestux_v1_wire_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -354,7 +478,7 @@ func (x *PcrBankEvidence) String() string {
 func (*PcrBankEvidence) ProtoMessage() {}
 
 func (x *PcrBankEvidence) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[3]
+	mi := &file_attestux_v1_wire_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -367,7 +491,7 @@ func (x *PcrBankEvidence) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PcrBankEvidence.ProtoReflect.Descriptor instead.
 func (*PcrBankEvidence) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{3}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *PcrBankEvidence) GetHashAlgorithm() uint32 {
@@ -401,7 +525,7 @@ type EndorsementKey struct {
 
 func (x *EndorsementKey) Reset() {
 	*x = EndorsementKey{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[4]
+	mi := &file_attestux_v1_wire_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +537,7 @@ func (x *EndorsementKey) String() string {
 func (*EndorsementKey) ProtoMessage() {}
 
 func (x *EndorsementKey) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[4]
+	mi := &file_attestux_v1_wire_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +550,7 @@ func (x *EndorsementKey) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EndorsementKey.ProtoReflect.Descriptor instead.
 func (*EndorsementKey) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{4}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *EndorsementKey) GetPublicKey() []byte {
@@ -444,21 +568,17 @@ func (x *EndorsementKey) GetCertificate() []byte {
 }
 
 type AttestationEvidence struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	AttestationPublic   []byte                 `protobuf:"bytes,1,opt,name=attestation_public,json=attestationPublic,proto3" json:"attestation_public,omitempty"`
-	PcrBanks            []*PcrBankEvidence     `protobuf:"bytes,2,rep,name=pcr_banks,json=pcrBanks,proto3" json:"pcr_banks,omitempty"`
-	EventLog            []byte                 `protobuf:"bytes,3,opt,name=event_log,json=eventLog,proto3" json:"event_log,omitempty"`
-	AkCreateData        []byte                 `protobuf:"bytes,4,opt,name=ak_create_data,json=akCreateData,proto3" json:"ak_create_data,omitempty"`
-	AkCreateAttestation []byte                 `protobuf:"bytes,5,opt,name=ak_create_attestation,json=akCreateAttestation,proto3" json:"ak_create_attestation,omitempty"`
-	AkCreateSignature   []byte                 `protobuf:"bytes,6,opt,name=ak_create_signature,json=akCreateSignature,proto3" json:"ak_create_signature,omitempty"`
-	EndorsementKeys     []*EndorsementKey      `protobuf:"bytes,7,rep,name=endorsement_keys,json=endorsementKeys,proto3" json:"endorsement_keys,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keys          *AttestationKeys       `protobuf:"bytes,1,opt,name=keys,proto3" json:"keys,omitempty"`
+	PcrBanks      []*PcrBankEvidence     `protobuf:"bytes,2,rep,name=pcr_banks,json=pcrBanks,proto3" json:"pcr_banks,omitempty"`
+	EventLog      []byte                 `protobuf:"bytes,3,opt,name=event_log,json=eventLog,proto3" json:"event_log,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AttestationEvidence) Reset() {
 	*x = AttestationEvidence{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[5]
+	mi := &file_attestux_v1_wire_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -470,7 +590,7 @@ func (x *AttestationEvidence) String() string {
 func (*AttestationEvidence) ProtoMessage() {}
 
 func (x *AttestationEvidence) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[5]
+	mi := &file_attestux_v1_wire_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -483,12 +603,12 @@ func (x *AttestationEvidence) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationEvidence.ProtoReflect.Descriptor instead.
 func (*AttestationEvidence) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{5}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *AttestationEvidence) GetAttestationPublic() []byte {
+func (x *AttestationEvidence) GetKeys() *AttestationKeys {
 	if x != nil {
-		return x.AttestationPublic
+		return x.Keys
 	}
 	return nil
 }
@@ -507,34 +627,6 @@ func (x *AttestationEvidence) GetEventLog() []byte {
 	return nil
 }
 
-func (x *AttestationEvidence) GetAkCreateData() []byte {
-	if x != nil {
-		return x.AkCreateData
-	}
-	return nil
-}
-
-func (x *AttestationEvidence) GetAkCreateAttestation() []byte {
-	if x != nil {
-		return x.AkCreateAttestation
-	}
-	return nil
-}
-
-func (x *AttestationEvidence) GetAkCreateSignature() []byte {
-	if x != nil {
-		return x.AkCreateSignature
-	}
-	return nil
-}
-
-func (x *AttestationEvidence) GetEndorsementKeys() []*EndorsementKey {
-	if x != nil {
-		return x.EndorsementKeys
-	}
-	return nil
-}
-
 type CredentialActivationChallenge struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	EndorsementKeySha256 []byte                 `protobuf:"bytes,1,opt,name=endorsement_key_sha256,json=endorsementKeySha256,proto3" json:"endorsement_key_sha256,omitempty"`
@@ -546,7 +638,7 @@ type CredentialActivationChallenge struct {
 
 func (x *CredentialActivationChallenge) Reset() {
 	*x = CredentialActivationChallenge{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[6]
+	mi := &file_attestux_v1_wire_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -558,7 +650,7 @@ func (x *CredentialActivationChallenge) String() string {
 func (*CredentialActivationChallenge) ProtoMessage() {}
 
 func (x *CredentialActivationChallenge) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[6]
+	mi := &file_attestux_v1_wire_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -571,7 +663,7 @@ func (x *CredentialActivationChallenge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CredentialActivationChallenge.ProtoReflect.Descriptor instead.
 func (*CredentialActivationChallenge) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{6}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CredentialActivationChallenge) GetEndorsementKeySha256() []byte {
@@ -595,64 +687,21 @@ func (x *CredentialActivationChallenge) GetEncryptedSecret() []byte {
 	return nil
 }
 
-type CredentialActivationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Secret        []byte                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CredentialActivationResponse) Reset() {
-	*x = CredentialActivationResponse{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CredentialActivationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CredentialActivationResponse) ProtoMessage() {}
-
-func (x *CredentialActivationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CredentialActivationResponse.ProtoReflect.Descriptor instead.
-func (*CredentialActivationResponse) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *CredentialActivationResponse) GetSecret() []byte {
-	if x != nil {
-		return x.Secret
-	}
-	return nil
-}
-
 type VerificationReceipt struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId       string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	Errors         []string               `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
-	EvidenceSha256 []byte                 `protobuf:"bytes,3,opt,name=evidence_sha256,json=evidenceSha256,proto3" json:"evidence_sha256,omitempty"`
-	TrustPolicy    TrustPolicy            `protobuf:"varint,4,opt,name=trust_policy,json=trustPolicy,proto3,enum=attestux.v1.TrustPolicy" json:"trust_policy,omitempty"`
-	Status         VerificationStatus     `protobuf:"varint,5,opt,name=status,proto3,enum=attestux.v1.VerificationStatus" json:"status,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	Errors   []string               `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
+	// Hash of the raw evidence response, or raw AttestationHello on early rejection.
+	EvidenceSha256 []byte             `protobuf:"bytes,3,opt,name=evidence_sha256,json=evidenceSha256,proto3" json:"evidence_sha256,omitempty"`
+	TrustPolicy    TrustPolicy        `protobuf:"varint,4,opt,name=trust_policy,json=trustPolicy,proto3,enum=attestux.v1.TrustPolicy" json:"trust_policy,omitempty"`
+	Status         VerificationStatus `protobuf:"varint,5,opt,name=status,proto3,enum=attestux.v1.VerificationStatus" json:"status,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *VerificationReceipt) Reset() {
 	*x = VerificationReceipt{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[8]
+	mi := &file_attestux_v1_wire_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -664,7 +713,7 @@ func (x *VerificationReceipt) String() string {
 func (*VerificationReceipt) ProtoMessage() {}
 
 func (x *VerificationReceipt) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[8]
+	mi := &file_attestux_v1_wire_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -677,7 +726,7 @@ func (x *VerificationReceipt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerificationReceipt.ProtoReflect.Descriptor instead.
 func (*VerificationReceipt) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{8}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *VerificationReceipt) GetDeviceId() string {
@@ -715,6 +764,51 @@ func (x *VerificationReceipt) GetStatus() VerificationStatus {
 	return VerificationStatus_VERIFICATION_STATUS_UNSPECIFIED
 }
 
+// Final verifier response; future optional session selection belongs here.
+type AttestationResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Receipt       *VerificationReceipt   `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AttestationResult) Reset() {
+	*x = AttestationResult{}
+	mi := &file_attestux_v1_wire_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AttestationResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AttestationResult) ProtoMessage() {}
+
+func (x *AttestationResult) ProtoReflect() protoreflect.Message {
+	mi := &file_attestux_v1_wire_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AttestationResult.ProtoReflect.Descriptor instead.
+func (*AttestationResult) Descriptor() ([]byte, []int) {
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AttestationResult) GetReceipt() *VerificationReceipt {
+	if x != nil {
+		return x.Receipt
+	}
+	return nil
+}
+
 type ProtocolError struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          ProtocolErrorCode      `protobuf:"varint,1,opt,name=code,proto3,enum=attestux.v1.ProtocolErrorCode" json:"code,omitempty"`
@@ -725,7 +819,7 @@ type ProtocolError struct {
 
 func (x *ProtocolError) Reset() {
 	*x = ProtocolError{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[9]
+	mi := &file_attestux_v1_wire_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -737,7 +831,7 @@ func (x *ProtocolError) String() string {
 func (*ProtocolError) ProtoMessage() {}
 
 func (x *ProtocolError) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[9]
+	mi := &file_attestux_v1_wire_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -750,7 +844,7 @@ func (x *ProtocolError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProtocolError.ProtoReflect.Descriptor instead.
 func (*ProtocolError) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{9}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ProtocolError) GetCode() ProtocolErrorCode {
@@ -776,8 +870,8 @@ type Frame struct {
 	//	*Frame_Challenge
 	//	*Frame_Evidence
 	//	*Frame_ActivationChallenge
-	//	*Frame_ActivationResponse
-	//	*Frame_Receipt
+	//	*Frame_Hello
+	//	*Frame_Result
 	//	*Frame_Error
 	Payload       isFrame_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
@@ -786,7 +880,7 @@ type Frame struct {
 
 func (x *Frame) Reset() {
 	*x = Frame{}
-	mi := &file_attestux_v1_wire_proto_msgTypes[10]
+	mi := &file_attestux_v1_wire_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -798,7 +892,7 @@ func (x *Frame) String() string {
 func (*Frame) ProtoMessage() {}
 
 func (x *Frame) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_v1_wire_proto_msgTypes[10]
+	mi := &file_attestux_v1_wire_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -811,7 +905,7 @@ func (x *Frame) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Frame.ProtoReflect.Descriptor instead.
 func (*Frame) Descriptor() ([]byte, []int) {
-	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{10}
+	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Frame) GetPayload() isFrame_Payload {
@@ -848,19 +942,19 @@ func (x *Frame) GetActivationChallenge() *CredentialActivationChallenge {
 	return nil
 }
 
-func (x *Frame) GetActivationResponse() *CredentialActivationResponse {
+func (x *Frame) GetHello() []byte {
 	if x != nil {
-		if x, ok := x.Payload.(*Frame_ActivationResponse); ok {
-			return x.ActivationResponse
+		if x, ok := x.Payload.(*Frame_Hello); ok {
+			return x.Hello
 		}
 	}
 	return nil
 }
 
-func (x *Frame) GetReceipt() *VerificationReceipt {
+func (x *Frame) GetResult() *AttestationResult {
 	if x != nil {
-		if x, ok := x.Payload.(*Frame_Receipt); ok {
-			return x.Receipt
+		if x, ok := x.Payload.(*Frame_Result); ok {
+			return x.Result
 		}
 	}
 	return nil
@@ -892,12 +986,13 @@ type Frame_ActivationChallenge struct {
 	ActivationChallenge *CredentialActivationChallenge `protobuf:"bytes,3,opt,name=activation_challenge,json=activationChallenge,proto3,oneof"`
 }
 
-type Frame_ActivationResponse struct {
-	ActivationResponse *CredentialActivationResponse `protobuf:"bytes,4,opt,name=activation_response,json=activationResponse,proto3,oneof"`
+type Frame_Hello struct {
+	// Encoded AttestationHello, retained intact if verification fails before quoting.
+	Hello []byte `protobuf:"bytes,4,opt,name=hello,proto3,oneof"`
 }
 
-type Frame_Receipt struct {
-	Receipt *VerificationReceipt `protobuf:"bytes,5,opt,name=receipt,proto3,oneof"`
+type Frame_Result struct {
+	Result *AttestationResult `protobuf:"bytes,5,opt,name=result,proto3,oneof"`
 }
 
 type Frame_Error struct {
@@ -910,9 +1005,9 @@ func (*Frame_Evidence) isFrame_Payload() {}
 
 func (*Frame_ActivationChallenge) isFrame_Payload() {}
 
-func (*Frame_ActivationResponse) isFrame_Payload() {}
+func (*Frame_Hello) isFrame_Payload() {}
 
-func (*Frame_Receipt) isFrame_Payload() {}
+func (*Frame_Result) isFrame_Payload() {}
 
 func (*Frame_Error) isFrame_Payload() {}
 
@@ -920,9 +1015,17 @@ var File_attestux_v1_wire_proto protoreflect.FileDescriptor
 
 const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\n" +
-	"\x16attestux/v1/wire.proto\x12\vattestux.v1\",\n" +
-	"\x14AttestationChallenge\x12\x14\n" +
-	"\x05nonce\x18\x01 \x01(\fR\x05nonce\";\n" +
+	"\x16attestux/v1/wire.proto\x12\vattestux.v1\"A\n" +
+	"\x14AttestationChallenge\x12)\n" +
+	"\x10protocol_version\x18\x01 \x01(\rR\x0fprotocolVersion\"D\n" +
+	"\x10AttestationHello\x120\n" +
+	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\"\x92\x02\n" +
+	"\x0fAttestationKeys\x12-\n" +
+	"\x12attestation_public\x18\x01 \x01(\fR\x11attestationPublic\x12$\n" +
+	"\x0eak_create_data\x18\x02 \x01(\fR\fakCreateData\x122\n" +
+	"\x15ak_create_attestation\x18\x03 \x01(\fR\x13akCreateAttestation\x12.\n" +
+	"\x13ak_create_signature\x18\x04 \x01(\fR\x11akCreateSignature\x12F\n" +
+	"\x10endorsement_keys\x18\x05 \x03(\v2\x1b.attestux.v1.EndorsementKeyR\x0fendorsementKeys\";\n" +
 	"\x05Quote\x12\x14\n" +
 	"\x05quote\x18\x01 \x01(\fR\x05quote\x12\x1c\n" +
 	"\tsignature\x18\x02 \x01(\fR\tsignature\"3\n" +
@@ -936,38 +1039,34 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\x0eEndorsementKey\x12\x1d\n" +
 	"\n" +
 	"public_key\x18\x01 \x01(\fR\tpublicKey\x12 \n" +
-	"\vcertificate\x18\x02 \x01(\fR\vcertificate\"\xee\x02\n" +
-	"\x13AttestationEvidence\x12-\n" +
-	"\x12attestation_public\x18\x01 \x01(\fR\x11attestationPublic\x129\n" +
+	"\vcertificate\x18\x02 \x01(\fR\vcertificate\"\x9f\x01\n" +
+	"\x13AttestationEvidence\x120\n" +
+	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\x129\n" +
 	"\tpcr_banks\x18\x02 \x03(\v2\x1c.attestux.v1.PcrBankEvidenceR\bpcrBanks\x12\x1b\n" +
-	"\tevent_log\x18\x03 \x01(\fR\beventLog\x12$\n" +
-	"\x0eak_create_data\x18\x04 \x01(\fR\fakCreateData\x122\n" +
-	"\x15ak_create_attestation\x18\x05 \x01(\fR\x13akCreateAttestation\x12.\n" +
-	"\x13ak_create_signature\x18\x06 \x01(\fR\x11akCreateSignature\x12F\n" +
-	"\x10endorsement_keys\x18\a \x03(\v2\x1b.attestux.v1.EndorsementKeyR\x0fendorsementKeys\"\xa0\x01\n" +
+	"\tevent_log\x18\x03 \x01(\fR\beventLog\"\xa0\x01\n" +
 	"\x1dCredentialActivationChallenge\x124\n" +
 	"\x16endorsement_key_sha256\x18\x01 \x01(\fR\x14endorsementKeySha256\x12\x1e\n" +
 	"\n" +
 	"credential\x18\x02 \x01(\fR\n" +
 	"credential\x12)\n" +
-	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\"6\n" +
-	"\x1cCredentialActivationResponse\x12\x16\n" +
-	"\x06secret\x18\x01 \x01(\fR\x06secret\"\xe9\x01\n" +
+	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\"\xe9\x01\n" +
 	"\x13VerificationReceipt\x12\x1b\n" +
 	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
 	"\x06errors\x18\x02 \x03(\tR\x06errors\x12'\n" +
 	"\x0fevidence_sha256\x18\x03 \x01(\fR\x0eevidenceSha256\x12;\n" +
 	"\ftrust_policy\x18\x04 \x01(\x0e2\x18.attestux.v1.TrustPolicyR\vtrustPolicy\x127\n" +
-	"\x06status\x18\x05 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"]\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"O\n" +
+	"\x11AttestationResult\x12:\n" +
+	"\areceipt\x18\x01 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"]\n" +
 	"\rProtocolError\x122\n" +
 	"\x04code\x18\x01 \x01(\x0e2\x1e.attestux.v1.ProtocolErrorCodeR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xa4\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xda\x02\n" +
 	"\x05Frame\x12A\n" +
 	"\tchallenge\x18\x01 \x01(\v2!.attestux.v1.AttestationChallengeH\x00R\tchallenge\x12\x1c\n" +
 	"\bevidence\x18\x02 \x01(\fH\x00R\bevidence\x12_\n" +
-	"\x14activation_challenge\x18\x03 \x01(\v2*.attestux.v1.CredentialActivationChallengeH\x00R\x13activationChallenge\x12\\\n" +
-	"\x13activation_response\x18\x04 \x01(\v2).attestux.v1.CredentialActivationResponseH\x00R\x12activationResponse\x12<\n" +
-	"\areceipt\x18\x05 \x01(\v2 .attestux.v1.VerificationReceiptH\x00R\areceipt\x122\n" +
+	"\x14activation_challenge\x18\x03 \x01(\v2*.attestux.v1.CredentialActivationChallengeH\x00R\x13activationChallenge\x12\x16\n" +
+	"\x05hello\x18\x04 \x01(\fH\x00R\x05hello\x128\n" +
+	"\x06result\x18\x05 \x01(\v2\x1e.attestux.v1.AttestationResultH\x00R\x06result\x122\n" +
 	"\x05error\x18\x06 \x01(\v2\x1a.attestux.v1.ProtocolErrorH\x00R\x05errorB\t\n" +
 	"\apayload*\xa7\x01\n" +
 	"\x12VerificationStatus\x12#\n" +
@@ -986,8 +1085,8 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"&PROTOCOL_ERROR_CODE_ATTESTATION_FAILED\x10\x03\x12 \n" +
 	"\x1cPROTOCOL_ERROR_CODE_INTERNAL\x10\x04\x12)\n" +
 	"%PROTOCOL_ERROR_CODE_ACTIVATION_FAILED\x10\x05\x12'\n" +
-	"#PROTOCOL_ERROR_CODE_DEVICE_MISMATCH\x10\x06B#\n" +
-	"\x1fcom.github.attestux.protocol.v1P\x01b\x06proto3"
+	"#PROTOCOL_ERROR_CODE_DEVICE_MISMATCH\x10\x06B[\n" +
+	"\x1fcom.github.attestux.protocol.v1P\x01Z6github.com/attestux/protocol-go/attestux/v1;attestuxv1b\x06proto3"
 
 var (
 	file_attestux_v1_wire_proto_rawDescOnce sync.Once
@@ -1002,41 +1101,45 @@ func file_attestux_v1_wire_proto_rawDescGZIP() []byte {
 }
 
 var file_attestux_v1_wire_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_attestux_v1_wire_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_attestux_v1_wire_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_attestux_v1_wire_proto_goTypes = []any{
 	(VerificationStatus)(0),               // 0: attestux.v1.VerificationStatus
 	(TrustPolicy)(0),                      // 1: attestux.v1.TrustPolicy
 	(ProtocolErrorCode)(0),                // 2: attestux.v1.ProtocolErrorCode
 	(*AttestationChallenge)(nil),          // 3: attestux.v1.AttestationChallenge
-	(*Quote)(nil),                         // 4: attestux.v1.Quote
-	(*Pcr)(nil),                           // 5: attestux.v1.Pcr
-	(*PcrBankEvidence)(nil),               // 6: attestux.v1.PcrBankEvidence
-	(*EndorsementKey)(nil),                // 7: attestux.v1.EndorsementKey
-	(*AttestationEvidence)(nil),           // 8: attestux.v1.AttestationEvidence
-	(*CredentialActivationChallenge)(nil), // 9: attestux.v1.CredentialActivationChallenge
-	(*CredentialActivationResponse)(nil),  // 10: attestux.v1.CredentialActivationResponse
-	(*VerificationReceipt)(nil),           // 11: attestux.v1.VerificationReceipt
-	(*ProtocolError)(nil),                 // 12: attestux.v1.ProtocolError
-	(*Frame)(nil),                         // 13: attestux.v1.Frame
+	(*AttestationHello)(nil),              // 4: attestux.v1.AttestationHello
+	(*AttestationKeys)(nil),               // 5: attestux.v1.AttestationKeys
+	(*Quote)(nil),                         // 6: attestux.v1.Quote
+	(*Pcr)(nil),                           // 7: attestux.v1.Pcr
+	(*PcrBankEvidence)(nil),               // 8: attestux.v1.PcrBankEvidence
+	(*EndorsementKey)(nil),                // 9: attestux.v1.EndorsementKey
+	(*AttestationEvidence)(nil),           // 10: attestux.v1.AttestationEvidence
+	(*CredentialActivationChallenge)(nil), // 11: attestux.v1.CredentialActivationChallenge
+	(*VerificationReceipt)(nil),           // 12: attestux.v1.VerificationReceipt
+	(*AttestationResult)(nil),             // 13: attestux.v1.AttestationResult
+	(*ProtocolError)(nil),                 // 14: attestux.v1.ProtocolError
+	(*Frame)(nil),                         // 15: attestux.v1.Frame
 }
 var file_attestux_v1_wire_proto_depIdxs = []int32{
-	4,  // 0: attestux.v1.PcrBankEvidence.quote:type_name -> attestux.v1.Quote
-	5,  // 1: attestux.v1.PcrBankEvidence.pcrs:type_name -> attestux.v1.Pcr
-	6,  // 2: attestux.v1.AttestationEvidence.pcr_banks:type_name -> attestux.v1.PcrBankEvidence
-	7,  // 3: attestux.v1.AttestationEvidence.endorsement_keys:type_name -> attestux.v1.EndorsementKey
-	1,  // 4: attestux.v1.VerificationReceipt.trust_policy:type_name -> attestux.v1.TrustPolicy
-	0,  // 5: attestux.v1.VerificationReceipt.status:type_name -> attestux.v1.VerificationStatus
-	2,  // 6: attestux.v1.ProtocolError.code:type_name -> attestux.v1.ProtocolErrorCode
-	3,  // 7: attestux.v1.Frame.challenge:type_name -> attestux.v1.AttestationChallenge
-	9,  // 8: attestux.v1.Frame.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
-	10, // 9: attestux.v1.Frame.activation_response:type_name -> attestux.v1.CredentialActivationResponse
-	11, // 10: attestux.v1.Frame.receipt:type_name -> attestux.v1.VerificationReceipt
-	12, // 11: attestux.v1.Frame.error:type_name -> attestux.v1.ProtocolError
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	5,  // 0: attestux.v1.AttestationHello.keys:type_name -> attestux.v1.AttestationKeys
+	9,  // 1: attestux.v1.AttestationKeys.endorsement_keys:type_name -> attestux.v1.EndorsementKey
+	6,  // 2: attestux.v1.PcrBankEvidence.quote:type_name -> attestux.v1.Quote
+	7,  // 3: attestux.v1.PcrBankEvidence.pcrs:type_name -> attestux.v1.Pcr
+	5,  // 4: attestux.v1.AttestationEvidence.keys:type_name -> attestux.v1.AttestationKeys
+	8,  // 5: attestux.v1.AttestationEvidence.pcr_banks:type_name -> attestux.v1.PcrBankEvidence
+	1,  // 6: attestux.v1.VerificationReceipt.trust_policy:type_name -> attestux.v1.TrustPolicy
+	0,  // 7: attestux.v1.VerificationReceipt.status:type_name -> attestux.v1.VerificationStatus
+	12, // 8: attestux.v1.AttestationResult.receipt:type_name -> attestux.v1.VerificationReceipt
+	2,  // 9: attestux.v1.ProtocolError.code:type_name -> attestux.v1.ProtocolErrorCode
+	3,  // 10: attestux.v1.Frame.challenge:type_name -> attestux.v1.AttestationChallenge
+	11, // 11: attestux.v1.Frame.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
+	13, // 12: attestux.v1.Frame.result:type_name -> attestux.v1.AttestationResult
+	14, // 13: attestux.v1.Frame.error:type_name -> attestux.v1.ProtocolError
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_attestux_v1_wire_proto_init() }
@@ -1044,12 +1147,12 @@ func file_attestux_v1_wire_proto_init() {
 	if File_attestux_v1_wire_proto != nil {
 		return
 	}
-	file_attestux_v1_wire_proto_msgTypes[10].OneofWrappers = []any{
+	file_attestux_v1_wire_proto_msgTypes[12].OneofWrappers = []any{
 		(*Frame_Challenge)(nil),
 		(*Frame_Evidence)(nil),
 		(*Frame_ActivationChallenge)(nil),
-		(*Frame_ActivationResponse)(nil),
-		(*Frame_Receipt)(nil),
+		(*Frame_Hello)(nil),
+		(*Frame_Result)(nil),
 		(*Frame_Error)(nil),
 	}
 	type x struct{}
@@ -1058,7 +1161,7 @@ func file_attestux_v1_wire_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_attestux_v1_wire_proto_rawDesc), len(file_attestux_v1_wire_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
