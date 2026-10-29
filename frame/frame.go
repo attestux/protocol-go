@@ -75,12 +75,13 @@ func Write(w io.Writer, frame *attestuxv1.Frame) error {
 	if frame.GetPayload() == nil {
 		return errors.New("frame has no payload")
 	}
+	limit := limitFor(frame)
+	if size := proto.Size(frame); size > limit {
+		return fmt.Errorf("%w: %d bytes, limit %d", ErrTooLarge, size, limit)
+	}
 	body, err := proto.Marshal(frame)
 	if err != nil {
 		return err
-	}
-	if limit := limitFor(frame); len(body) > limit {
-		return fmt.Errorf("%w: %d bytes, limit %d", ErrTooLarge, len(body), limit)
 	}
 	var prefix [prefixSize]byte
 	binary.BigEndian.PutUint32(prefix[:], uint32(len(body)))
