@@ -70,6 +70,17 @@ func TestWriteRejectsFramesWithoutPayload(t *testing.T) {
 	}
 }
 
+func TestWriteRejectsOversizedFramesBeforeMarshaling(t *testing.T) {
+	message := errorFrame(strings.Repeat("\xff", MaxControlFrame))
+	if _, err := proto.Marshal(message); err == nil {
+		t.Fatal("fixture must fail marshaling because its message is not valid UTF-8")
+	}
+	var wire bytes.Buffer
+	if err := Write(&wire, message); !errors.Is(err, ErrTooLarge) || wire.Len() != 0 {
+		t.Fatalf("Write = %v, wrote %d bytes; want size rejection before marshaling", err, wire.Len())
+	}
+}
+
 type writerFunc func([]byte) (int, error)
 
 func (f writerFunc) Write(p []byte) (int, error) { return f(p) }
