@@ -497,8 +497,7 @@ func (x *VerificationCompletion) GetReceipt() *v1.VerificationReceipt {
 
 type PendingVerification struct {
 	state               protoimpl.MessageState            `protogen:"open.v1"`
-	Report              *VerificationReport               `protobuf:"bytes,1,opt,name=report,proto3" json:"report,omitempty"`
-	ActivationChallenge *v1.CredentialActivationChallenge `protobuf:"bytes,2,opt,name=activation_challenge,json=activationChallenge,proto3" json:"activation_challenge,omitempty"`
+	ActivationChallenge *v1.CredentialActivationChallenge `protobuf:"bytes,1,opt,name=activation_challenge,json=activationChallenge,proto3" json:"activation_challenge,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -531,13 +530,6 @@ func (x *PendingVerification) ProtoReflect() protoreflect.Message {
 // Deprecated: Use PendingVerification.ProtoReflect.Descriptor instead.
 func (*PendingVerification) Descriptor() ([]byte, []int) {
 	return file_attestux_result_v1_result_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *PendingVerification) GetReport() *VerificationReport {
-	if x != nil {
-		return x.Report
-	}
-	return nil
 }
 
 func (x *PendingVerification) GetActivationChallenge() *v1.CredentialActivationChallenge {
@@ -669,10 +661,9 @@ const file_attestux_result_v1_result_proto_rawDesc = "" +
 	"\vlimitations\x18\f \x03(\tR\vlimitations\"\x94\x01\n" +
 	"\x16VerificationCompletion\x12>\n" +
 	"\x06report\x18\x01 \x01(\v2&.attestux.result.v1.VerificationReportR\x06report\x12:\n" +
-	"\areceipt\x18\x02 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"\xb4\x01\n" +
-	"\x13PendingVerification\x12>\n" +
-	"\x06report\x18\x01 \x01(\v2&.attestux.result.v1.VerificationReportR\x06report\x12]\n" +
-	"\x14activation_challenge\x18\x02 \x01(\v2*.attestux.v1.CredentialActivationChallengeR\x13activationChallenge\"\xb6\x01\n" +
+	"\areceipt\x18\x02 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"t\n" +
+	"\x13PendingVerification\x12]\n" +
+	"\x14activation_challenge\x18\x01 \x01(\v2*.attestux.v1.CredentialActivationChallengeR\x13activationChallenge\"\xb6\x01\n" +
 	"\x17VerificationPreparation\x12C\n" +
 	"\apending\x18\x01 \x01(\v2'.attestux.result.v1.PendingVerificationH\x00R\apending\x12L\n" +
 	"\n" +
@@ -725,15 +716,14 @@ var file_attestux_result_v1_result_proto_depIdxs = []int32{
 	10, // 6: attestux.result.v1.VerificationReport.status:type_name -> attestux.v1.VerificationStatus
 	4,  // 7: attestux.result.v1.VerificationCompletion.report:type_name -> attestux.result.v1.VerificationReport
 	11, // 8: attestux.result.v1.VerificationCompletion.receipt:type_name -> attestux.v1.VerificationReceipt
-	4,  // 9: attestux.result.v1.PendingVerification.report:type_name -> attestux.result.v1.VerificationReport
-	12, // 10: attestux.result.v1.PendingVerification.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
-	6,  // 11: attestux.result.v1.VerificationPreparation.pending:type_name -> attestux.result.v1.PendingVerification
-	5,  // 12: attestux.result.v1.VerificationPreparation.completion:type_name -> attestux.result.v1.VerificationCompletion
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	12, // 9: attestux.result.v1.PendingVerification.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
+	6,  // 10: attestux.result.v1.VerificationPreparation.pending:type_name -> attestux.result.v1.PendingVerification
+	5,  // 11: attestux.result.v1.VerificationPreparation.completion:type_name -> attestux.result.v1.VerificationCompletion
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_attestux_result_v1_result_proto_init() }
