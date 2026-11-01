@@ -495,55 +495,11 @@ func (x *VerificationCompletion) GetReceipt() *v1.VerificationReceipt {
 	return nil
 }
 
-type PendingVerification struct {
-	state               protoimpl.MessageState            `protogen:"open.v1"`
-	ActivationChallenge *v1.CredentialActivationChallenge `protobuf:"bytes,1,opt,name=activation_challenge,json=activationChallenge,proto3" json:"activation_challenge,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *PendingVerification) Reset() {
-	*x = PendingVerification{}
-	mi := &file_attestux_result_v1_result_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PendingVerification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PendingVerification) ProtoMessage() {}
-
-func (x *PendingVerification) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_result_v1_result_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PendingVerification.ProtoReflect.Descriptor instead.
-func (*PendingVerification) Descriptor() ([]byte, []int) {
-	return file_attestux_result_v1_result_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *PendingVerification) GetActivationChallenge() *v1.CredentialActivationChallenge {
-	if x != nil {
-		return x.ActivationChallenge
-	}
-	return nil
-}
-
 type VerificationPreparation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Result:
 	//
-	//	*VerificationPreparation_Pending
+	//	*VerificationPreparation_ActivationChallenge
 	//	*VerificationPreparation_Completion
 	Result        isVerificationPreparation_Result `protobuf_oneof:"result"`
 	unknownFields protoimpl.UnknownFields
@@ -552,7 +508,7 @@ type VerificationPreparation struct {
 
 func (x *VerificationPreparation) Reset() {
 	*x = VerificationPreparation{}
-	mi := &file_attestux_result_v1_result_proto_msgTypes[6]
+	mi := &file_attestux_result_v1_result_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -564,7 +520,7 @@ func (x *VerificationPreparation) String() string {
 func (*VerificationPreparation) ProtoMessage() {}
 
 func (x *VerificationPreparation) ProtoReflect() protoreflect.Message {
-	mi := &file_attestux_result_v1_result_proto_msgTypes[6]
+	mi := &file_attestux_result_v1_result_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -577,7 +533,7 @@ func (x *VerificationPreparation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerificationPreparation.ProtoReflect.Descriptor instead.
 func (*VerificationPreparation) Descriptor() ([]byte, []int) {
-	return file_attestux_result_v1_result_proto_rawDescGZIP(), []int{6}
+	return file_attestux_result_v1_result_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *VerificationPreparation) GetResult() isVerificationPreparation_Result {
@@ -587,10 +543,10 @@ func (x *VerificationPreparation) GetResult() isVerificationPreparation_Result {
 	return nil
 }
 
-func (x *VerificationPreparation) GetPending() *PendingVerification {
+func (x *VerificationPreparation) GetActivationChallenge() *v1.CredentialActivationChallenge {
 	if x != nil {
-		if x, ok := x.Result.(*VerificationPreparation_Pending); ok {
-			return x.Pending
+		if x, ok := x.Result.(*VerificationPreparation_ActivationChallenge); ok {
+			return x.ActivationChallenge
 		}
 	}
 	return nil
@@ -609,15 +565,15 @@ type isVerificationPreparation_Result interface {
 	isVerificationPreparation_Result()
 }
 
-type VerificationPreparation_Pending struct {
-	Pending *PendingVerification `protobuf:"bytes,1,opt,name=pending,proto3,oneof"`
+type VerificationPreparation_ActivationChallenge struct {
+	ActivationChallenge *v1.CredentialActivationChallenge `protobuf:"bytes,1,opt,name=activation_challenge,json=activationChallenge,proto3,oneof"`
 }
 
 type VerificationPreparation_Completion struct {
 	Completion *VerificationCompletion `protobuf:"bytes,2,opt,name=completion,proto3,oneof"`
 }
 
-func (*VerificationPreparation_Pending) isVerificationPreparation_Result() {}
+func (*VerificationPreparation_ActivationChallenge) isVerificationPreparation_Result() {}
 
 func (*VerificationPreparation_Completion) isVerificationPreparation_Result() {}
 
@@ -661,11 +617,9 @@ const file_attestux_result_v1_result_proto_rawDesc = "" +
 	"\vlimitations\x18\f \x03(\tR\vlimitations\"\x94\x01\n" +
 	"\x16VerificationCompletion\x12>\n" +
 	"\x06report\x18\x01 \x01(\v2&.attestux.result.v1.VerificationReportR\x06report\x12:\n" +
-	"\areceipt\x18\x02 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"t\n" +
-	"\x13PendingVerification\x12]\n" +
-	"\x14activation_challenge\x18\x01 \x01(\v2*.attestux.v1.CredentialActivationChallengeR\x13activationChallenge\"\xb6\x01\n" +
-	"\x17VerificationPreparation\x12C\n" +
-	"\apending\x18\x01 \x01(\v2'.attestux.result.v1.PendingVerificationH\x00R\apending\x12L\n" +
+	"\areceipt\x18\x02 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"\xd2\x01\n" +
+	"\x17VerificationPreparation\x12_\n" +
+	"\x14activation_challenge\x18\x01 \x01(\v2*.attestux.v1.CredentialActivationChallengeH\x00R\x13activationChallenge\x12L\n" +
 	"\n" +
 	"completion\x18\x02 \x01(\v2*.attestux.result.v1.VerificationCompletionH\x00R\n" +
 	"completionB\b\n" +
@@ -690,7 +644,7 @@ func file_attestux_result_v1_result_proto_rawDescGZIP() []byte {
 }
 
 var file_attestux_result_v1_result_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_attestux_result_v1_result_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_attestux_result_v1_result_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_attestux_result_v1_result_proto_goTypes = []any{
 	(ReplayState)(0),                         // 0: attestux.result.v1.ReplayState
 	(*EventDigest)(nil),                      // 1: attestux.result.v1.EventDigest
@@ -698,32 +652,30 @@ var file_attestux_result_v1_result_proto_goTypes = []any{
 	(*PcrResult)(nil),                        // 3: attestux.result.v1.PcrResult
 	(*VerificationReport)(nil),               // 4: attestux.result.v1.VerificationReport
 	(*VerificationCompletion)(nil),           // 5: attestux.result.v1.VerificationCompletion
-	(*PendingVerification)(nil),              // 6: attestux.result.v1.PendingVerification
-	(*VerificationPreparation)(nil),          // 7: attestux.result.v1.VerificationPreparation
-	(*v1.Pcr)(nil),                           // 8: attestux.v1.Pcr
-	(v1.TrustPolicy)(0),                      // 9: attestux.v1.TrustPolicy
-	(v1.VerificationStatus)(0),               // 10: attestux.v1.VerificationStatus
-	(*v1.VerificationReceipt)(nil),           // 11: attestux.v1.VerificationReceipt
-	(*v1.CredentialActivationChallenge)(nil), // 12: attestux.v1.CredentialActivationChallenge
+	(*VerificationPreparation)(nil),          // 6: attestux.result.v1.VerificationPreparation
+	(*v1.Pcr)(nil),                           // 7: attestux.v1.Pcr
+	(v1.TrustPolicy)(0),                      // 8: attestux.v1.TrustPolicy
+	(v1.VerificationStatus)(0),               // 9: attestux.v1.VerificationStatus
+	(*v1.VerificationReceipt)(nil),           // 10: attestux.v1.VerificationReceipt
+	(*v1.CredentialActivationChallenge)(nil), // 11: attestux.v1.CredentialActivationChallenge
 }
 var file_attestux_result_v1_result_proto_depIdxs = []int32{
 	0,  // 0: attestux.result.v1.EventDigest.state:type_name -> attestux.result.v1.ReplayState
 	1,  // 1: attestux.result.v1.Event.digests:type_name -> attestux.result.v1.EventDigest
-	8,  // 2: attestux.result.v1.PcrResult.pcr:type_name -> attestux.v1.Pcr
+	7,  // 2: attestux.result.v1.PcrResult.pcr:type_name -> attestux.v1.Pcr
 	3,  // 3: attestux.result.v1.VerificationReport.pcrs:type_name -> attestux.result.v1.PcrResult
 	2,  // 4: attestux.result.v1.VerificationReport.events:type_name -> attestux.result.v1.Event
-	9,  // 5: attestux.result.v1.VerificationReport.trust_policy:type_name -> attestux.v1.TrustPolicy
-	10, // 6: attestux.result.v1.VerificationReport.status:type_name -> attestux.v1.VerificationStatus
+	8,  // 5: attestux.result.v1.VerificationReport.trust_policy:type_name -> attestux.v1.TrustPolicy
+	9,  // 6: attestux.result.v1.VerificationReport.status:type_name -> attestux.v1.VerificationStatus
 	4,  // 7: attestux.result.v1.VerificationCompletion.report:type_name -> attestux.result.v1.VerificationReport
-	11, // 8: attestux.result.v1.VerificationCompletion.receipt:type_name -> attestux.v1.VerificationReceipt
-	12, // 9: attestux.result.v1.PendingVerification.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
-	6,  // 10: attestux.result.v1.VerificationPreparation.pending:type_name -> attestux.result.v1.PendingVerification
-	5,  // 11: attestux.result.v1.VerificationPreparation.completion:type_name -> attestux.result.v1.VerificationCompletion
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	10, // 8: attestux.result.v1.VerificationCompletion.receipt:type_name -> attestux.v1.VerificationReceipt
+	11, // 9: attestux.result.v1.VerificationPreparation.activation_challenge:type_name -> attestux.v1.CredentialActivationChallenge
+	5,  // 10: attestux.result.v1.VerificationPreparation.completion:type_name -> attestux.result.v1.VerificationCompletion
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_attestux_result_v1_result_proto_init() }
@@ -731,8 +683,8 @@ func file_attestux_result_v1_result_proto_init() {
 	if File_attestux_result_v1_result_proto != nil {
 		return
 	}
-	file_attestux_result_v1_result_proto_msgTypes[6].OneofWrappers = []any{
-		(*VerificationPreparation_Pending)(nil),
+	file_attestux_result_v1_result_proto_msgTypes[5].OneofWrappers = []any{
+		(*VerificationPreparation_ActivationChallenge)(nil),
 		(*VerificationPreparation_Completion)(nil),
 	}
 	type x struct{}
@@ -741,7 +693,7 @@ func file_attestux_result_v1_result_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_attestux_result_v1_result_proto_rawDesc), len(file_attestux_result_v1_result_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
