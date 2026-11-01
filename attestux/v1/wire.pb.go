@@ -517,8 +517,7 @@ func (x *PcrBankEvidence) GetPcrs() []*Pcr {
 
 type EndorsementKey struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PublicKey     []byte                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	Certificate   []byte                 `protobuf:"bytes,2,opt,name=certificate,proto3" json:"certificate,omitempty"`
+	Certificate   []byte                 `protobuf:"bytes,1,opt,name=certificate,proto3" json:"certificate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -551,13 +550,6 @@ func (x *EndorsementKey) ProtoReflect() protoreflect.Message {
 // Deprecated: Use EndorsementKey.ProtoReflect.Descriptor instead.
 func (*EndorsementKey) Descriptor() ([]byte, []int) {
 	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *EndorsementKey) GetPublicKey() []byte {
-	if x != nil {
-		return x.PublicKey
-	}
-	return nil
 }
 
 func (x *EndorsementKey) GetCertificate() []byte {
@@ -1035,11 +1027,9 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\x0fPcrBankEvidence\x12%\n" +
 	"\x0ehash_algorithm\x18\x01 \x01(\rR\rhashAlgorithm\x12(\n" +
 	"\x05quote\x18\x02 \x01(\v2\x12.attestux.v1.QuoteR\x05quote\x12$\n" +
-	"\x04pcrs\x18\x03 \x03(\v2\x10.attestux.v1.PcrR\x04pcrs\"Q\n" +
-	"\x0eEndorsementKey\x12\x1d\n" +
-	"\n" +
-	"public_key\x18\x01 \x01(\fR\tpublicKey\x12 \n" +
-	"\vcertificate\x18\x02 \x01(\fR\vcertificate\"\x9f\x01\n" +
+	"\x04pcrs\x18\x03 \x03(\v2\x10.attestux.v1.PcrR\x04pcrs\"2\n" +
+	"\x0eEndorsementKey\x12 \n" +
+	"\vcertificate\x18\x01 \x01(\fR\vcertificate\"\x9f\x01\n" +
 	"\x13AttestationEvidence\x120\n" +
 	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\x129\n" +
 	"\tpcr_banks\x18\x02 \x03(\v2\x1c.attestux.v1.PcrBankEvidenceR\bpcrBanks\x12\x1b\n" +
