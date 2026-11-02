@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+	"slices"
 	"strings"
 	"testing"
 
@@ -283,8 +284,11 @@ func TestHelloAndResultPayloads(t *testing.T) {
 			var hello attestuxv1.AttestationHello
 			return proto.Unmarshal(frame.GetHello(), &hello) == nil && bytes.Equal(hello.GetKeys().GetAttestationPublic(), []byte{0x55})
 		}},
-		{"result", []byte{0x2a, 5, 0x0a, 3, 0x0a, 1, 0x55}, func(frame *attestuxv1.Frame) bool {
-			return frame.GetResult().GetReceipt().GetDeviceId() == "U"
+		{"result", []byte{0x2a, 9, 0x0a, 7, 0x0a, 1, 0x55, 0x10, 1, 0x18, 2}, func(frame *attestuxv1.Frame) bool {
+			receipt := frame.GetResult().GetReceipt()
+			return slices.Equal(receipt.GetErrors(), []string{"U"}) &&
+				receipt.GetTrustPolicy() == attestuxv1.TrustPolicy_TRUST_POLICY_NUVOTON &&
+				receipt.GetStatus() == attestuxv1.VerificationStatus_VERIFICATION_STATUS_VERIFIED
 		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {

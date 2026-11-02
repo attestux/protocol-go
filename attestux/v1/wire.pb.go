@@ -680,15 +680,12 @@ func (x *CredentialActivationChallenge) GetEncryptedSecret() []byte {
 }
 
 type VerificationReceipt struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	Errors   []string               `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
-	// Hash of the raw evidence response, or raw AttestationHello on early rejection.
-	EvidenceSha256 []byte             `protobuf:"bytes,3,opt,name=evidence_sha256,json=evidenceSha256,proto3" json:"evidence_sha256,omitempty"`
-	TrustPolicy    TrustPolicy        `protobuf:"varint,4,opt,name=trust_policy,json=trustPolicy,proto3,enum=attestux.v1.TrustPolicy" json:"trust_policy,omitempty"`
-	Status         VerificationStatus `protobuf:"varint,5,opt,name=status,proto3,enum=attestux.v1.VerificationStatus" json:"status,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Errors        []string               `protobuf:"bytes,1,rep,name=errors,proto3" json:"errors,omitempty"`
+	TrustPolicy   TrustPolicy            `protobuf:"varint,2,opt,name=trust_policy,json=trustPolicy,proto3,enum=attestux.v1.TrustPolicy" json:"trust_policy,omitempty"`
+	Status        VerificationStatus     `protobuf:"varint,3,opt,name=status,proto3,enum=attestux.v1.VerificationStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *VerificationReceipt) Reset() {
@@ -721,23 +718,9 @@ func (*VerificationReceipt) Descriptor() ([]byte, []int) {
 	return file_attestux_v1_wire_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *VerificationReceipt) GetDeviceId() string {
-	if x != nil {
-		return x.DeviceId
-	}
-	return ""
-}
-
 func (x *VerificationReceipt) GetErrors() []string {
 	if x != nil {
 		return x.Errors
-	}
-	return nil
-}
-
-func (x *VerificationReceipt) GetEvidenceSha256() []byte {
-	if x != nil {
-		return x.EvidenceSha256
 	}
 	return nil
 }
@@ -970,7 +953,7 @@ type Frame_Challenge struct {
 }
 
 type Frame_Evidence struct {
-	// Encoded AttestationEvidence, kept intact for the receipt hash.
+	// Encoded AttestationEvidence, retained intact with the verification report.
 	Evidence []byte `protobuf:"bytes,2,opt,name=evidence,proto3,oneof"`
 }
 
@@ -1039,13 +1022,11 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\n" +
 	"credential\x18\x02 \x01(\fR\n" +
 	"credential\x12)\n" +
-	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\"\xe9\x01\n" +
-	"\x13VerificationReceipt\x12\x1b\n" +
-	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\x12\x16\n" +
-	"\x06errors\x18\x02 \x03(\tR\x06errors\x12'\n" +
-	"\x0fevidence_sha256\x18\x03 \x01(\fR\x0eevidenceSha256\x12;\n" +
-	"\ftrust_policy\x18\x04 \x01(\x0e2\x18.attestux.v1.TrustPolicyR\vtrustPolicy\x127\n" +
-	"\x06status\x18\x05 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"O\n" +
+	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\"\xa3\x01\n" +
+	"\x13VerificationReceipt\x12\x16\n" +
+	"\x06errors\x18\x01 \x03(\tR\x06errors\x12;\n" +
+	"\ftrust_policy\x18\x02 \x01(\x0e2\x18.attestux.v1.TrustPolicyR\vtrustPolicy\x127\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"O\n" +
 	"\x11AttestationResult\x12:\n" +
 	"\areceipt\x18\x01 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"]\n" +
 	"\rProtocolError\x122\n" +
