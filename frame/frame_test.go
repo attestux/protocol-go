@@ -280,15 +280,17 @@ func TestHelloAndResultPayloads(t *testing.T) {
 		body  []byte
 		check func(*attestuxv1.Frame) bool
 	}{
-		{"hello", []byte{0x22, 5, 0x0a, 3, 0x0a, 1, 0x55}, func(frame *attestuxv1.Frame) bool {
+		{"hello", append([]byte{0x22, 39, 0x0a, 3, 0x0a, 1, 0x55, 0x12, 32}, bytes.Repeat([]byte{7}, 32)...), func(frame *attestuxv1.Frame) bool {
 			var hello attestuxv1.AttestationHello
-			return proto.Unmarshal(frame.GetHello(), &hello) == nil && bytes.Equal(hello.GetKeys().GetAttestationPublic(), []byte{0x55})
+			return proto.Unmarshal(frame.GetHello(), &hello) == nil && bytes.Equal(hello.GetKeys().GetAttestationPublic(), []byte{0x55}) &&
+				bytes.Equal(hello.ProverNonce, bytes.Repeat([]byte{7}, 32))
 		}},
-		{"result", []byte{0x2a, 9, 0x0a, 7, 0x0a, 1, 0x55, 0x10, 1, 0x18, 2}, func(frame *attestuxv1.Frame) bool {
+		{"result", append([]byte{0x2a, 43, 0x0a, 7, 0x0a, 1, 0x55, 0x10, 1, 0x18, 2, 0x12, 32}, bytes.Repeat([]byte{7}, 32)...), func(frame *attestuxv1.Frame) bool {
 			receipt := frame.GetResult().GetReceipt()
 			return slices.Equal(receipt.GetErrors(), []string{"U"}) &&
 				receipt.GetTrustPolicy() == attestuxv1.TrustPolicy_TRUST_POLICY_NUVOTON &&
-				receipt.GetStatus() == attestuxv1.VerificationStatus_VERIFICATION_STATUS_VERIFIED
+				receipt.GetStatus() == attestuxv1.VerificationStatus_VERIFICATION_STATUS_VERIFIED &&
+				bytes.Equal(frame.GetResult().ProverNonce, bytes.Repeat([]byte{7}, 32))
 		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
