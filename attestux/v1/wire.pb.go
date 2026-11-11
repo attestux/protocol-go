@@ -231,8 +231,10 @@ func (x *AttestationChallenge) GetProtocolVersion() uint32 {
 
 // Initial prover response; future optional session capabilities belong here.
 type AttestationHello struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keys          *AttestationKeys       `protobuf:"bytes,1,opt,name=keys,proto3" json:"keys,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Keys  *AttestationKeys       `protobuf:"bytes,1,opt,name=keys,proto3" json:"keys,omitempty"`
+	// Fresh random 32-byte value for this prover exchange
+	ProverNonce   []byte `protobuf:"bytes,2,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -270,6 +272,13 @@ func (*AttestationHello) Descriptor() ([]byte, []int) {
 func (x *AttestationHello) GetKeys() *AttestationKeys {
 	if x != nil {
 		return x.Keys
+	}
+	return nil
+}
+
+func (x *AttestationHello) GetProverNonce() []byte {
+	if x != nil {
+		return x.ProverNonce
 	}
 	return nil
 }
@@ -624,8 +633,10 @@ type CredentialActivationChallenge struct {
 	EndorsementKeySha256 []byte                 `protobuf:"bytes,1,opt,name=endorsement_key_sha256,json=endorsementKeySha256,proto3" json:"endorsement_key_sha256,omitempty"`
 	Credential           []byte                 `protobuf:"bytes,2,opt,name=credential,proto3" json:"credential,omitempty"`
 	EncryptedSecret      []byte                 `protobuf:"bytes,3,opt,name=encrypted_secret,json=encryptedSecret,proto3" json:"encrypted_secret,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Echoes AttestationHello.prover_nonce; check before using the TPM
+	ProverNonce   []byte `protobuf:"bytes,4,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CredentialActivationChallenge) Reset() {
@@ -675,6 +686,13 @@ func (x *CredentialActivationChallenge) GetCredential() []byte {
 func (x *CredentialActivationChallenge) GetEncryptedSecret() []byte {
 	if x != nil {
 		return x.EncryptedSecret
+	}
+	return nil
+}
+
+func (x *CredentialActivationChallenge) GetProverNonce() []byte {
+	if x != nil {
+		return x.ProverNonce
 	}
 	return nil
 }
@@ -743,6 +761,7 @@ func (x *VerificationReceipt) GetStatus() VerificationStatus {
 type AttestationResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Receipt       *VerificationReceipt   `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
+	ProverNonce   []byte                 `protobuf:"bytes,2,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -784,10 +803,19 @@ func (x *AttestationResult) GetReceipt() *VerificationReceipt {
 	return nil
 }
 
+func (x *AttestationResult) GetProverNonce() []byte {
+	if x != nil {
+		return x.ProverNonce
+	}
+	return nil
+}
+
 type ProtocolError struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          ProtocolErrorCode      `protobuf:"varint,1,opt,name=code,proto3,enum=attestux.v1.ProtocolErrorCode" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Code    ProtocolErrorCode      `protobuf:"varint,1,opt,name=code,proto3,enum=attestux.v1.ProtocolErrorCode" json:"code,omitempty"`
+	Message string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Echoes the hello's nonce once the session is known
+	ProverNonce   []byte `protobuf:"bytes,3,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -834,6 +862,13 @@ func (x *ProtocolError) GetMessage() string {
 		return x.Message
 	}
 	return ""
+}
+
+func (x *ProtocolError) GetProverNonce() []byte {
+	if x != nil {
+		return x.ProverNonce
+	}
+	return nil
 }
 
 // One USB frame behind a big-endian u32 length. The payload limits are
@@ -992,9 +1027,10 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\n" +
 	"\x16attestux/v1/wire.proto\x12\vattestux.v1\"A\n" +
 	"\x14AttestationChallenge\x12)\n" +
-	"\x10protocol_version\x18\x01 \x01(\rR\x0fprotocolVersion\"D\n" +
+	"\x10protocol_version\x18\x01 \x01(\rR\x0fprotocolVersion\"g\n" +
 	"\x10AttestationHello\x120\n" +
-	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\"\x92\x02\n" +
+	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\x12!\n" +
+	"\fprover_nonce\x18\x02 \x01(\fR\vproverNonce\"\x92\x02\n" +
 	"\x0fAttestationKeys\x12-\n" +
 	"\x12attestation_public\x18\x01 \x01(\fR\x11attestationPublic\x12$\n" +
 	"\x0eak_create_data\x18\x02 \x01(\fR\fakCreateData\x122\n" +
@@ -1016,22 +1052,25 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"\x13AttestationEvidence\x120\n" +
 	"\x04keys\x18\x01 \x01(\v2\x1c.attestux.v1.AttestationKeysR\x04keys\x129\n" +
 	"\tpcr_banks\x18\x02 \x03(\v2\x1c.attestux.v1.PcrBankEvidenceR\bpcrBanks\x12\x1b\n" +
-	"\tevent_log\x18\x03 \x01(\fR\beventLog\"\xa0\x01\n" +
+	"\tevent_log\x18\x03 \x01(\fR\beventLog\"\xc3\x01\n" +
 	"\x1dCredentialActivationChallenge\x124\n" +
 	"\x16endorsement_key_sha256\x18\x01 \x01(\fR\x14endorsementKeySha256\x12\x1e\n" +
 	"\n" +
 	"credential\x18\x02 \x01(\fR\n" +
 	"credential\x12)\n" +
-	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\"\xa3\x01\n" +
+	"\x10encrypted_secret\x18\x03 \x01(\fR\x0fencryptedSecret\x12!\n" +
+	"\fprover_nonce\x18\x04 \x01(\fR\vproverNonce\"\xa3\x01\n" +
 	"\x13VerificationReceipt\x12\x16\n" +
 	"\x06errors\x18\x01 \x03(\tR\x06errors\x12;\n" +
 	"\ftrust_policy\x18\x02 \x01(\x0e2\x18.attestux.v1.TrustPolicyR\vtrustPolicy\x127\n" +
-	"\x06status\x18\x03 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"O\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1f.attestux.v1.VerificationStatusR\x06status\"r\n" +
 	"\x11AttestationResult\x12:\n" +
-	"\areceipt\x18\x01 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\"]\n" +
+	"\areceipt\x18\x01 \x01(\v2 .attestux.v1.VerificationReceiptR\areceipt\x12!\n" +
+	"\fprover_nonce\x18\x02 \x01(\fR\vproverNonce\"\x80\x01\n" +
 	"\rProtocolError\x122\n" +
 	"\x04code\x18\x01 \x01(\x0e2\x1e.attestux.v1.ProtocolErrorCodeR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xda\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
+	"\fprover_nonce\x18\x03 \x01(\fR\vproverNonce\"\xda\x02\n" +
 	"\x05Frame\x12A\n" +
 	"\tchallenge\x18\x01 \x01(\v2!.attestux.v1.AttestationChallengeH\x00R\tchallenge\x12\x1c\n" +
 	"\bevidence\x18\x02 \x01(\fH\x00R\bevidence\x12_\n" +
