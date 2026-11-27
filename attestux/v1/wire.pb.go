@@ -633,7 +633,7 @@ type CredentialActivationChallenge struct {
 	EndorsementKeySha256 []byte                 `protobuf:"bytes,1,opt,name=endorsement_key_sha256,json=endorsementKeySha256,proto3" json:"endorsement_key_sha256,omitempty"`
 	Credential           []byte                 `protobuf:"bytes,2,opt,name=credential,proto3" json:"credential,omitempty"`
 	EncryptedSecret      []byte                 `protobuf:"bytes,3,opt,name=encrypted_secret,json=encryptedSecret,proto3" json:"encrypted_secret,omitempty"`
-	// Echoes AttestationHello.prover_nonce; check before using the TPM
+	// Echoes AttestationHello.prover_nonce, the prover must check it before using the TPM
 	ProverNonce   []byte `protobuf:"bytes,4,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -759,9 +759,10 @@ func (x *VerificationReceipt) GetStatus() VerificationStatus {
 
 // Final verifier response; future optional session selection belongs here
 type AttestationResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Receipt       *VerificationReceipt   `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
-	ProverNonce   []byte                 `protobuf:"bytes,2,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Receipt *VerificationReceipt   `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
+	// Echoes AttestationHello.prover_nonce
+	ProverNonce   []byte `protobuf:"bytes,2,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -814,7 +815,7 @@ type ProtocolError struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Code    ProtocolErrorCode      `protobuf:"varint,1,opt,name=code,proto3,enum=attestux.v1.ProtocolErrorCode" json:"code,omitempty"`
 	Message string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	// Echoes the hello's nonce once the session is known
+	// Echoes AttestationHello.prover_nonce, empty if the error precedes the hello
 	ProverNonce   []byte `protobuf:"bytes,3,opt,name=prover_nonce,json=proverNonce,proto3" json:"prover_nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -988,7 +989,7 @@ type Frame_Challenge struct {
 }
 
 type Frame_Evidence struct {
-	// Encoded AttestationEvidence, kept intact for the receipt hash
+	// Encoded AttestationEvidence, kept as raw bytes so the report's evidence_sha256 covers what was sent
 	Evidence []byte `protobuf:"bytes,2,opt,name=evidence,proto3,oneof"`
 }
 
@@ -997,7 +998,7 @@ type Frame_ActivationChallenge struct {
 }
 
 type Frame_Hello struct {
-	// Encoded AttestationHello, retained intact if verification fails before quoting
+	// Encoded AttestationHello, hashed instead if verification ends before evidence arrives
 	Hello []byte `protobuf:"bytes,4,opt,name=hello,proto3,oneof"`
 }
 
@@ -1095,8 +1096,8 @@ const file_attestux_v1_wire_proto_rawDesc = "" +
 	"&PROTOCOL_ERROR_CODE_ATTESTATION_FAILED\x10\x03\x12 \n" +
 	"\x1cPROTOCOL_ERROR_CODE_INTERNAL\x10\x04\x12)\n" +
 	"%PROTOCOL_ERROR_CODE_ACTIVATION_FAILED\x10\x05\x12'\n" +
-	"#PROTOCOL_ERROR_CODE_DEVICE_MISMATCH\x10\x06B[\n" +
-	"\x1fcom.github.attestux.protocol.v1P\x01Z6github.com/attestux/protocol-go/attestux/v1;attestuxv1b\x06proto3"
+	"#PROTOCOL_ERROR_CODE_DEVICE_MISMATCH\x10\x06BT\n" +
+	"\x18com.attestux.protocol.v1P\x01Z6github.com/attestux/protocol-go/attestux/v1;attestuxv1b\x06proto3"
 
 var (
 	file_attestux_v1_wire_proto_rawDescOnce sync.Once

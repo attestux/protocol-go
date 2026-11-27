@@ -231,9 +231,10 @@ func (x *Event) GetDigests() []*EventDigest {
 type PcrResult struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Pcr   *v1.Pcr                `protobuf:"bytes,1,opt,name=pcr,proto3" json:"pcr,omitempty"`
-	// If replay succeeds with zero events, the PCR hasn't left its initial value
-	EventLogReplayed   bool   `protobuf:"varint,2,opt,name=event_log_replayed,json=eventLogReplayed,proto3" json:"event_log_replayed,omitempty"`
-	HashAlgorithm      uint32 `protobuf:"varint,3,opt,name=hash_algorithm,json=hashAlgorithm,proto3" json:"hash_algorithm,omitempty"`
+	// True if replay reproduces the PCR digest
+	EventLogReplayed bool   `protobuf:"varint,2,opt,name=event_log_replayed,json=eventLogReplayed,proto3" json:"event_log_replayed,omitempty"`
+	HashAlgorithm    uint32 `protobuf:"varint,3,opt,name=hash_algorithm,json=hashAlgorithm,proto3" json:"hash_algorithm,omitempty"`
+	// If event_log_replayed is true, zero means the PCR remains at its initial value
 	ReplayedEventCount uint32 `protobuf:"varint,4,opt,name=replayed_event_count,json=replayedEventCount,proto3" json:"replayed_event_count,omitempty"`
 	// Replay needed synthetic events that weren't in the received log
 	ReplayUsedUnloggedEvents bool `protobuf:"varint,5,opt,name=replay_used_unlogged_events,json=replayUsedUnloggedEvents,proto3" json:"replay_used_unlogged_events,omitempty"`
@@ -313,7 +314,7 @@ type VerificationReport struct {
 	Events   []*Event               `protobuf:"bytes,3,rep,name=events,proto3" json:"events,omitempty"`
 	Warnings []string               `protobuf:"bytes,4,rep,name=warnings,proto3" json:"warnings,omitempty"`
 	Errors   []string               `protobuf:"bytes,5,rep,name=errors,proto3" json:"errors,omitempty"`
-	// Hash of the raw evidence response or raw AttestationHello if no quote arrived.
+	// Hash of the raw evidence response or raw AttestationHello if no evidence arrived
 	EvidenceSha256 []byte                `protobuf:"bytes,6,opt,name=evidence_sha256,json=evidenceSha256,proto3" json:"evidence_sha256,omitempty"`
 	TrustPolicy    v1.TrustPolicy        `protobuf:"varint,7,opt,name=trust_policy,json=trustPolicy,proto3,enum=attestux.v1.TrustPolicy" json:"trust_policy,omitempty"`
 	Status         v1.VerificationStatus `protobuf:"varint,8,opt,name=status,proto3,enum=attestux.v1.VerificationStatus" json:"status,omitempty"`
@@ -628,8 +629,8 @@ const file_attestux_result_v1_result_proto_rawDesc = "" +
 	"\x18REPLAY_STATE_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15REPLAY_STATE_VERIFIED\x10\x01\x12\x1b\n" +
 	"\x17REPLAY_STATE_UNVERIFIED\x10\x02\x12\x17\n" +
-	"\x13REPLAY_STATE_FAILED\x10\x03Bg\n" +
-	"&com.github.attestux.protocol.result.v1P\x01Z;github.com/attestux/protocol-go/attestux/result/v1;resultv1b\x06proto3"
+	"\x13REPLAY_STATE_FAILED\x10\x03B`\n" +
+	"\x1fcom.attestux.protocol.result.v1P\x01Z;github.com/attestux/protocol-go/attestux/result/v1;resultv1b\x06proto3"
 
 var (
 	file_attestux_result_v1_result_proto_rawDescOnce sync.Once
